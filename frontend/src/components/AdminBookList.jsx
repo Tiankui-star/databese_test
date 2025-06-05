@@ -41,6 +41,8 @@ function AdminBookList() {
       <LogoutButton />
       <h2> 管理员图书管理</h2>
       <button onClick={() => navigate('/lend')}>查看借阅记录</button>
+      <h2><button onClick={() => navigate('/readers')}>管理读者</button></h2>
+
       <ul>
         {books.map((book) => (
           <li key={book.id}>

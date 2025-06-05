@@ -73,6 +73,62 @@ app.post('/login/admin', (req, res) => {
     }
   });
 });
+// 获取所有读者
+// 获取所有读者
+app.get('/readers', (req, res) => {
+  db.query("SELECT id, username, password, realName, sex, birthday, address, tel, email FROM reader_info", (err, rows) => {
+    if (err) {
+      console.error('❌ 查询读者失败:', err);
+      return res.status(500).send('查询失败');
+    }
+    res.json(rows);
+  });
+});
+
+
+
+// 添加读者
+app.post('/readers', async (req, res) => {
+  const { username, password, realName = '', sex = '', birthday = null, address = '', tel = '', email = '' } = req.body;
+
+  if (!username || !password) return res.status(400).send('用户名或密码不能为空');
+
+  try {
+    await db.query(
+      `INSERT INTO reader_info 
+       (username, password, realName, sex, birthday, address, tel, email) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [username, password, realName, sex, birthday, address, tel, email]
+    );
+    res.sendStatus(201);
+  } catch (err) {
+    console.error('❌ 添加读者失败:', err);
+    res.status(500).send('添加失败：' + err.message);
+  }
+});
+
+
+// 删除读者
+// 删除读者
+app.delete('/readers/:id', (req, res) => {
+  const id = req.params.id;
+  const sql = 'DELETE FROM reader_info WHERE id = ?';
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error('❌ 删除读者失败:', err);
+      return res.status(500).send('删除失败');
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).send('未找到该读者');
+    }
+    res.json({ message: '读者删除成功' });
+  });
+});
+
+
+
+
 
 // ✅ 读者登录接口
 app.post('/login/reader', (req, res) => {

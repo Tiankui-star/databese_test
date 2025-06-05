@@ -1,10 +1,10 @@
-// App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import AdminBookList from './components/AdminBookList';
 import ReaderBookView from './components/ReaderBookView';
 import LendList from './components/LendList';
+import ManageReaders from './components/ManageReaders'; // ✅ 新增
 
 function App() {
   const userType = localStorage.getItem('userType');
@@ -39,6 +39,14 @@ function App() {
             ) : (
               <Navigate to="/" replace />
             )
+          }
+        />
+
+        {/* ✅ 新增：管理员才能访问 */}
+        <Route
+          path="/readers"
+          element={
+            userType === 'admin' ? <ManageReaders /> : <Navigate to="/" replace />
           }
         />
       </Routes>
