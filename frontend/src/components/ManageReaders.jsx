@@ -1,11 +1,18 @@
-// components/ManageReaders.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 function ManageReaders() {
   const [readers, setReaders] = useState([]);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState({
+    username: '',
+    password: '',
+    realName: '',
+    sex: '',
+    birthday: '',
+    address: '',
+    tel: '',
+    email: '',
+  });
 
   // 获取读者列表
   const fetchReaders = async () => {
@@ -23,59 +30,79 @@ function ManageReaders() {
 
   // 添加读者
   const handleAdd = async () => {
+    const { username, password } = form;
+    if (!username || !password) {
+      alert('用户名和密码不能为空');
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:3001/readers', { username, password });
-      setUsername('');
-      setPassword('');
+      await axios.post('http://localhost:3001/readers', form);
+      setForm({
+        username: '',
+        password: '',
+        realName: '',
+        sex: '',
+        birthday: '',
+        address: '',
+        tel: '',
+        email: '',
+      });
       fetchReaders(); // 刷新列表
     } catch (err) {
       console.error('添加读者失败', err);
     }
   };
 
-  // 删除读者（可选）
-  const handleDelete = (id) => {
-  console.log('🧪 handleDelete id =', id);
-
-  axios.delete(`http://localhost:3001/readers/${id}`)
-    .then(() => {
-      alert('删除成功');
-      fetchReaders(); // 删除后刷新列表
-    })
-    .catch(err => {
-      console.error('删除读者失败 AxiosError', err);
-      alert('删除失败');
-    });
-};
-
-
+  // 删除读者
+  const handleDelete = (username) => {
+    console.log('删除读者 username =', username);
+    axios
+      .delete(`http://localhost:3001/readers/${username}`)
+      .then(() => {
+        alert('删除成功');
+        fetchReaders();
+      })
+      .catch((err) => {
+        console.error('删除读者失败 AxiosError', err);
+        alert('删除失败');
+      });
+  };
 
   return (
     <div style={{ padding: 20 }}>
-      <h2>📋 读者管理</h2>
+      <h2> 读者管理</h2>
 
       <h3>新增读者</h3>
-      <input
-        placeholder="用户名"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      /><br />
-      <input
-        type="password"
-        placeholder="密码"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      /><br />
+      {[
+        ['用户名', 'username'],
+        ['密码', 'password'],
+        ['真实姓名', 'realName'],
+        ['性别', 'sex'],
+        ['生日', 'birthday'],
+        ['地址', 'address'],
+        ['电话', 'tel'],
+        ['邮箱', 'email'],
+      ].map(([label, key]) => (
+        <div key={key}>
+          <input
+            placeholder={label}
+            type={key === 'password' ? 'password' : key === 'birthday' ? 'date' : 'text'}
+            value={form[key]}
+            onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+          />
+          <br />
+        </div>
+      ))}
+
       <button onClick={handleAdd}>添加</button>
 
       <h3>当前读者列表</h3>
       <ul>
-        {readers.map((r) => (
-          <li key={r.id}>
-            {r.username}
-            <button onClick={() => handleDelete(r.id)}>删除</button>
-
-
+        {readers.map((r, index) => (
+          <li key={index}>
+            {r.username}（{r.realName || '未填写'}）
+            <button onClick={() => handleDelete(r.username)}>删除</button>
           </li>
         ))}
       </ul>

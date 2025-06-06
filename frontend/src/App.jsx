@@ -4,7 +4,8 @@ import Login from './components/Login';
 import AdminBookList from './components/AdminBookList';
 import ReaderBookView from './components/ReaderBookView';
 import LendList from './components/LendList';
-import ManageReaders from './components/ManageReaders'; // ✅ 新增
+import ManageReaders from './components/ManageReaders'; //  新增
+import TypeTabView from './components/TypeTabView';
 
 function App() {
   const userType = localStorage.getItem('userType');
@@ -13,7 +14,7 @@ function App() {
   try {
     user = JSON.parse(localStorage.getItem('user')) || null;
   } catch (e) {
-    console.warn('❗ localStorage user 解析失败', e);
+    console.warn('! localStorage user 解析失败', e);
     user = null;
   }
 
@@ -30,7 +31,7 @@ function App() {
             <Navigate to="/" replace />
           }
         />
-
+    
         <Route
           path="/lend"
           element={
@@ -41,8 +42,11 @@ function App() {
             )
           }
         />
-
-        {/* ✅ 新增：管理员才能访问 */}
+        <Route
+  path="/types"
+  element={<TypeTabView />}
+/>
+        {/* 新增：管理员才能访问 */}
         <Route
           path="/readers"
           element={
