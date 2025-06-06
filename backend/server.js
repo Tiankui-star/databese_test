@@ -1,7 +1,6 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
-const db = require('./db'); // 引入数据库连接配置
+const db = require('./db'); 
 
 const app = express();
 
@@ -110,7 +109,7 @@ app.put('/lend/return/:id', (req, res) => {
   const sql = 'UPDATE lend_list SET backType = 1 WHERE id = ?';
   db.query(sql, [id], (err) => {
     if (err) {
-      console.error('❌ 归还失败:', err);
+      console.error(' 归还失败:', err);
       return res.status(500).send('归还失败');
     }
     res.json({ message: '归还成功' });
