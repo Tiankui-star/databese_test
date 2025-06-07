@@ -20,6 +20,7 @@ function LendList({ userType, readerId }) {
 
   useEffect(() => {
     fetchRecords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userType, readerId]);
 
   const getStatus = (record) => {

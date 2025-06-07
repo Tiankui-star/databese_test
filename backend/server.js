@@ -164,7 +164,6 @@ app.post('/login/reader', (req, res) => {
   const username = req.body.username.trim();
   const password = req.body.password.trim();
 
-  console.log(' 登录尝试:', username, password);
 
   const sql = 'SELECT * FROM reader_info WHERE username = ? AND password = ?';
   db.query(sql, [username, password], (err, results) => {
@@ -267,15 +266,42 @@ app.post('/lend', (req, res) => {
 //  归还图书
 app.put('/lend/return/:id', (req, res) => {
   const id = req.params.id;
+
   const sql = 'UPDATE lend_list SET backType = 1 WHERE id = ?';
+
+  // 先设置归还状态
   db.query(sql, [id], (err) => {
     if (err) {
-      console.error(' 归还失败:', err);
+      console.error('归还失败:', err);
       return res.status(500).send('归还失败');
     }
-    res.json({ message: '归还成功' });
+
+    // 查 bookId
+    const getBookIdSql = 'SELECT bookId FROM lend_list WHERE id = ?';
+    db.query(getBookIdSql, [id], (err, result) => {
+      if (err || result.length === 0) {
+        console.error('获取bookId失败:', err);
+        return res.status(500).send('归还成功但库存未更新');
+      }
+
+      const bookId = result[0].bookId;
+      console.log('111,bookId:',id);
+      // 再更新库存
+      const sql_update = 'UPDATE book_info SET stock = stock + 1 WHERE id = ?';
+      db.query(sql_update, [bookId], (err) => {
+        if (err) {
+          console.error('库存更新失败:', err);
+          return res.status(500).send('库存更新失败');
+        }
+        console.log('111,bookId:',bookId);
+        // 最终只发送一次响应
+        res.json({ message: '归还成功，库存已更新' });
+      });
+    });
   });
 });
+
+
 app.get('/book-types', (req, res) => {
   const sql = `
     SELECT t.id AS typeId, t.name AS typeName,t.remarks as typeRemark, b.id AS bookId, b.name AS bookName, b.author, b.stock
@@ -288,7 +314,7 @@ app.get('/book-types', (req, res) => {
       console.error('查询图书分类失败:', err);
       return res.status(500).send('查询失败');
     }
-
+   
     const grouped = {};
     results.forEach((row) => {
       if (!grouped[row.typeId]) {
