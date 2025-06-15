@@ -1,11 +1,11 @@
-const express = require('express');
-const cors = require('cors');
-const db = require('./db'); 
+const express = require('express'); // 引入express模块
+const cors = require('cors'); //引入cors模块，用于跨域请求，即前端可以跨域请求后端接口
+const db = require('./db'); // 引入数据库模块
 
-const app = express();
+const app = express(); // 创建express实例，即web服务器框架
 
-app.use(cors());
-app.use(express.json());
+app.use(cors()); //允许前端跨域
+app.use(express.json()); //解析json请求体
 
 console.log('正在启动服务...');
 
@@ -103,18 +103,18 @@ app.get('/readers', (req, res) => {
   });
 });
 
-// server.js
-app.put('/lend/return/:id', (req, res) => {
-  const id = req.params.id;
-  const sql = 'UPDATE lend_list SET backType = 1 WHERE id = ?';
-  db.query(sql, [id], (err) => {
-    if (err) {
-      console.error(' 归还失败:', err);
-      return res.status(500).send('归还失败');
-    }
-    res.json({ message: '归还成功' });
-  });
-});
+// 借书
+// app.put('/lend/return/:id', (req, res) => {
+//   const id = req.params.id;
+//   const sql = 'UPDATE lend_list SET backType = 1 WHERE id = ?';
+//   db.query(sql, [id], (err) => {
+//     if (err) {
+//       console.error(' 归还失败:', err);
+//       return res.status(500).send('归还失败');
+//     }
+//     res.json({ message: '归还成功' });
+//   });
+// });
 
 
 // 添加读者
@@ -285,7 +285,7 @@ app.put('/lend/return/:id', (req, res) => {
       }
 
       const bookId = result[0].bookId;
-      console.log('111,bookId:',id);
+
       // 再更新库存
       const sql_update = 'UPDATE book_info SET stock = stock + 1 WHERE id = ?';
       db.query(sql_update, [bookId], (err) => {
@@ -293,13 +293,13 @@ app.put('/lend/return/:id', (req, res) => {
           console.error('库存更新失败:', err);
           return res.status(500).send('库存更新失败');
         }
-        console.log('111,bookId:',bookId);
         // 最终只发送一次响应
         res.json({ message: '归还成功，库存已更新' });
       });
     });
   });
 });
+
 
 
 app.get('/book-types', (req, res) => {
@@ -343,4 +343,4 @@ app.get('/book-types', (req, res) => {
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(` 服务器运行中： http://localhost:${PORT}`);
-});
+}); 

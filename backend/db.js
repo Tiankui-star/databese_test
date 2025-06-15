@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+const mysql = require('mysql'); // 引入mysql模块
 
 const db = mysql.createConnection({
   host: 'localhost',      
@@ -15,6 +15,6 @@ db.connect((err) => {
   } else {
     console.log('已成功连接到数据库');
   }
-});
+}); //向数据库发起连接请求
 
-module.exports = db;
+module.exports = db; // 将db暴露出去,方便其他文件调用
